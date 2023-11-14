@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from mininet.topo import Topo
 
 class CustomTopology(Topo):
@@ -5,8 +6,9 @@ class CustomTopology(Topo):
         if len_switches < 2:
             exit("El número de switches debe ser al menos 2")
         
-        hosts = [self.addHost(f"host_{i}") for i in range(1, 5)]
-        switches = [self.addSwitch(f"switch_{i}") for i in range(1, len_switches + 1)]
+        hosts = [self.addHost("host_{}".format(i)) for i in range(1, 5)]
+        switches = [self.addSwitch("switch_{}".format(i)) for i in range(1, len_switches + 1)]
+
         
         for i in range(len_switches - 1):
             self.addLink(switches[i], switches[i + 1])
