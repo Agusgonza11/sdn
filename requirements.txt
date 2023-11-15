@@ -1,2 +1,2 @@
-ConfigParser==6.0.0
+configparser==6.0.0
 mininet==2.3.0.dev6

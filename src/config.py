@@ -1,7 +1,7 @@
-import ConfigParser
+import configparser
 
 def read_configuration(config_file):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser.ConfigParser()
     config.read(config_file)
 
     if 'Config' in config.sections():
