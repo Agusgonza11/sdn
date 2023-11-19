@@ -7,18 +7,33 @@ class NetworkProtocol:
         self.controller = openflow
         self.network_rules = self._load_rules()
 
-    def add_rule(self):
+    def add_rules(self):
+        block_match = openflow.ofp_match()
+
         for rule in self.network_rules:
-            self._add_rule(rule)
-        message = self._create_message_from_rules()
+            self._add_rule(rule, block_match)
+
+        message = self._create_message_from_rules(block_match)
         self.controller.send(message)
 
-    def add_transport_rule(self):
+    def _add_transport_rule(self, rule, block_match):
+        if "source_port" in rule:
+            block_match.tp_src = rule["transport"]["source_port"]
+        if "destination_port" in rule:
+            block_match.tp_dst = rule["transport"]["destination_port"]
+
+    def _add_xxx_rule(self):
         pass
 
-    def _create_message_from_rules(self, block_match):
-        # block_match = openflow.ofp_match()
+    def _add_yyy_rule(self):
+        pass
 
+    def _add_rule(self, rule, block_match):
+        self._add_transport_rule(rule, block_match)
+        self._add_xxx_rule()
+        self._add_yyy_rule()
+
+    def _create_message_from_rules(self, block_match):
         message = self._get_message_for_flow_entry()
         message.match = block_match
 
