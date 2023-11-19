@@ -21,8 +21,7 @@ class Firewall(EventMixin):
         self.network_protocol = NetworkProtocol()
 
     def _handle_ConnectionUp(self, event):
-        # Add your logic here ...
-        pass
+        self.network_protocol.add_rules()
 
     def launch(self):
         # Starting the Firewall module

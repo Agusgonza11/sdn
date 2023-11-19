@@ -1,5 +1,7 @@
 import json
 import pox.openflow.libopenflow_01 as openflow
+import pox.lib.packet as pkt
+from pox.lib.addresses import IPAddr
 
 
 # The Network Protocol allows that through a central controller, policies can be defined on how packets should be
@@ -21,21 +23,24 @@ class NetworkProtocol:
         self.controller.send(message)
 
     def _add_transport_rule(self, rule, block_match):
+        if "tcp" in rule:
+            block_match.nw_proto = pkt.tcp
+        if "udp" in rule:
+            block_match.nw_proto = pkt.udp
         if "source_port" in rule:
             block_match.tp_src = rule["transport"]["source_port"]
         if "destination_port" in rule:
             block_match.tp_dst = rule["transport"]["destination_port"]
 
-    def _add_xxx_rule(self):
-        pass
-
-    def _add_yyy_rule(self):
-        pass
+    def _add_network_rule(self, rule, block_match):
+        if "source_ip" in rule:
+            block_match.nw_src = IPAddr(rule["host"]["source_ip"])
+        if "destination_ip" in rule:
+            block_match.nw_dst = IPAddr(rule["host"]["destination_ip"])
 
     def _add_rule(self, rule, block_match):
         self._add_transport_rule(rule, block_match)
-        self._add_xxx_rule()
-        self._add_yyy_rule()
+        self._add_network_rule(rule, block_match)
 
     def _create_message_from_rules(self, block_match):
         message = self._get_message_for_flow_entry()
