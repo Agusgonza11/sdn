@@ -1,0 +1,46 @@
+{
+  "firewall": {
+    "network_rules": [
+      {
+        "description": "All messages whose destination port is 80 are discarded.",
+        "transport": {
+            "protocol": ["tcp", "udp"],
+            "destination_port": "80"
+        }
+      },
+      {
+        "description": "All messages that come from Host 1, have 5001 as their destination port, and are using the UDP protocol are discarded.",
+        "transport": {
+          "protocol": ["udp"],
+          "destination_port": "5001"
+        },
+        "host": {
+          "name": "Host 1",
+          "source_ip": "192.168.1.2"
+        }
+      },
+      {
+        "description":"Host A won't be able to communicate in any way with Host B.",
+        "transport": {
+          "protocol": ["tcp", "udp"]
+        },
+        "host": {
+          "name": "Host A",
+          "source_ip": "192.168.1.5",
+          "destination_ip": "192.168.1.6"
+        }
+      },
+      {
+        "description":"Host B won't be able to communicate in any way with Host A.",
+        "transport": {
+          "protocol": ["tcp", "udp"]
+        },
+        "host": {
+          "name": "Host B",
+          "source_ip": "192.168.1.6",
+          "destination_ip": "192.168.1.5"
+        }
+      }
+    ]
+  }
+}
