@@ -12,7 +12,7 @@ def read_configuration(config_file):
 
         return config.items('Config')
 
-def get_configuration_values(config_file='config.ini'):
+def get_configuration_values(config_file='rules.ini'):
     config_items = read_configuration(config_file)
     configuration = dict(config_items)
     result = {}

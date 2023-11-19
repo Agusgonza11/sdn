@@ -6,6 +6,7 @@ from pox.pox.lib.addresses import EthAddr
 from src.config import get_configuration_values
 from collections import namedtuple
 import os
+import argparse
 
 log = core.getLogger()
 # Add your global variables here ...
@@ -14,15 +15,18 @@ TCP = 6
 UDP = 17
 
 class Firewall(EventMixin):
-    def __init__(self):
+    def __init__(self, switch_id=1):
         self.listenTo(core.openflow)
         log.debug("Enabling Firewall Module")
         self.rules = get_configuration_values()
+        self.switch_id = switch_id
 
     def _handle_ConnectionUp(self, event):
         log.debug("The switch %s is connected", event.dpid)
 
     def _handle_PacketIn(self, event):
+        if self.switch_id is not None and self.switch_id != event.dpid:
+            return
         packet = event.parsed
         if packet.type == packet.IP_TYPE:
             ip_packet = packet.find("ipv4")
@@ -65,5 +69,5 @@ class Firewall(EventMixin):
         msg.in_port = event.port
         event.connection.send(msg)
 
-    def launch(self):
-        core.registerNew(Firewall)
+    def launch(switch_id=1):
+        core.registerNew(Firewall, switch_id=switch_id)
