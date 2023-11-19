@@ -2,6 +2,10 @@ import json
 import pox.openflow.libopenflow_01 as openflow
 
 
+# The Network Protocol allows that through a central controller, policies can be defined on how packets should be
+# sent and classified. The radical advantage that OpenFlow offers is the independence of the hardware to perform
+# these actions.
+
 class NetworkProtocol:
     def __init__(self):
         self.controller = openflow
