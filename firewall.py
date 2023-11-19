@@ -1,19 +1,24 @@
+import json
+
 from pox.pox.core import core
-import pox.pox.openflow.libopenflow_01 as of
 from pox.pox.lib.revent import *
-from pox.pox.lib.util import dpidToStr
-from pox.pox.lib.addresses import EthAddr
-from collections import namedtuple
-import os
 
-log = core . getLogger()
-# Add your global variables here ...
+from network_protocol import NetworkProtocol
+from pox.lib.revent import EventMixin
 
+# Global Logger
+
+log = core.getLogger()
+
+
+# The Firewall is a security network component who is in charge of monitor  / outgoing traffic network
+# and who is also responsible for managing the entrance or blocking of specific traffic according to a set of rules
 
 class Firewall(EventMixin):
     def __init__(self):
-        self.listenTo(core.openflow)
         log.debug("Enabling Firewall Module")
+        self.listenTo(core.openflow)
+        self.network_protocol = NetworkProtocol()
 
     def _handle_ConnectionUp(self, event):
         # Add your logic here ...
