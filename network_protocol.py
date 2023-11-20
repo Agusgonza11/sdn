@@ -16,7 +16,7 @@ class NetworkProtocol:
     def add_rules(self):
         block_match = openflow.ofp_match()
 
-        for rule in self.network_rules:
+        for rule in self.network_rules["firewall"]["network_rules"]:
             self._add_rule(rule, block_match)
 
         message = self._create_message_from_rules(block_match)
@@ -50,6 +50,10 @@ class NetworkProtocol:
 
     def _get_message_for_flow_entry(self):
         return self.controller.ofp_flow_mod()
+
+    def print_rules(self):
+        formatted_data = json.dumps(self.network_rules, indent=4)
+        print(formatted_data)
 
     def _load_rules(self, file_path="firewall_rules.json"):
         try:
