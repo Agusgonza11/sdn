@@ -3,7 +3,7 @@ import pox.pox.openflow.libopenflow_01 as of
 from pox.pox.lib.revent import *
 from pox.pox.lib.util import dpidToStr
 from pox.pox.lib.addresses import EthAddr
-from src.config import get_configuration_values
+from src.rules import get_configuration_values
 from collections import namedtuple
 import os
 import argparse
@@ -20,12 +20,13 @@ class Firewall(EventMixin):
     def __init__(self, switch_id=1):
         self.listenTo(core.openflow)
         log.debug("Enabling Firewall Module")
+        # Lista de diccionarios con las reglas
         self.rules = get_configuration_values()
         self.switch_id = switch_id
         log.debug("Firewall initialized for switch %s", switch_id)
 
     def _handle_ConnectionUp(self, event):
-        log.debug("The switch %s is connected", event.dpid)
+        pass
 
     def _handle_PacketIn(self, event):
         if self.switch_id != event.dpid:
@@ -51,7 +52,7 @@ class Firewall(EventMixin):
                     src_host = self.get_host_from_ip(src_ip, event.topology)
                     dst_host = self.get_host_from_ip(dst_ip, event.topology)
 
-                    self.filter_packet(event, ip_packet.protocol, src_ip, dst_ip, src_port, dst_port, src_host, dst_host)
+                    self.filter_packet(packet)
 
     def get_host_from_ip(self, ip_address, topology):
         for host_number, ip_addresses in topology.hosts.items():
@@ -60,18 +61,12 @@ class Firewall(EventMixin):
         return None
 
     def filter_packet(self, event, protocol, src_ip, dst_ip, src_port, dst_port, src_host, dst_host):
-        if protocol in self.rules["protocol"]:
-            self.drop_packet(event)
-            return
-        if src_ip in self.rules["src_host"] or dst_ip in self.rules["dst_host"]:
-            self.drop_packet(event)
-            return
-        if str(src_port) in self.rules["src_port"] or str(dst_port) in self.rules["dst_port"]:
-            self.drop_packet(event)
-            return
-        if (src_host, dst_host) in self.rules["incommunicable_hosts"] or (dst_host, src_host) in self.rules["incommunicable_hosts"]:
-            self.drop_packet(event)
-            return
+        for r in self.rules:
+            # puerto de destino 80
+
+            # source host_1, puerto 5001, protocolo UDP
+
+            # Conexion entre 2 y 4 bloqueada
 
     def drop_packet(self, event):
         log.debug("Entra a romper el paquete")
