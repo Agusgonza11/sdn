@@ -28,20 +28,27 @@ class Firewall(EventMixin):
         if self.switch_id is not None and self.switch_id != event.dpid:
             return
         packet = event.parsed
+        print(f"The packet was {packet}")
+        log.debug("Received packet: %s", packet)  # Esta línea imprime el paquete completo
+
         if packet.type == packet.IP_TYPE:
             ip_packet = packet.find("ipv4")
             protocol = ip_packet.protocol
             src_host = self.get_host_from_ip(ip_packet.srcip)
             dst_host = self.get_host_from_ip(ip_packet.dstip)
-            src_ip = ip_packet.src_ip
-            dst_ip = ip_packet.src_ip
+            src_ip = ip_packet.srcip
+            dst_ip = ip_packet.dstip
+            transport_packet = None
             if ip_packet.protocol == TCP:
-                packet = ip_packet.find("tcp")
-            if ip_packet.protocol == UDP:
-                packet = ip_packet.find("udp")
-            src_port = packet.srcport
-            dst_port = packet.dstport
-            self.filter_packet(event, protocol, src_ip, dst_ip, src_port, dst_port, src_host, dst_host)
+                transport_packet = ip_packet.find("tcp")
+            elif ip_packet.protocol == UDP:
+                transport_packet = ip_packet.find("udp")
+            if transport_packet:
+                src_port = transport_packet.srcport
+                dst_port = transport_packet.dstport
+                self.filter_packet(event, protocol, src_ip, dst_ip, src_port, dst_port, src_host, dst_host)
+
+
 
     def get_host_from_ip(self, ip_address):
         for host_number, ip_addresses in self.topology.hosts.items():
@@ -69,5 +76,6 @@ class Firewall(EventMixin):
         msg.in_port = event.port
         event.connection.send(msg)
 
+    @classmethod
     def launch(switch_id=1):
         core.registerNew(Firewall, switch_id=switch_id)
