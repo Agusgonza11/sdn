@@ -17,6 +17,7 @@ class Firewall(EventMixin):
     def __init__(self):
         log.debug("Enabling Firewall Module")
         self.listenTo(core.openflow)
+        self.switch_id = 1
         self.network_protocol = NetworkProtocol()
 
     def _handle_ConnectionUp(self, event):

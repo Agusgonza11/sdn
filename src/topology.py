@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from mininet.topo import Topo
 
-TOPOS = {'CustomTopology' : (lambda : CustomTopology())}
+TOPOS = {'CustomTopology': (lambda: CustomTopology())}
+
 
 class CustomTopology(Topo):
     def __init__(self, n_switches=2):
