@@ -26,12 +26,17 @@ def get_configuration_values():
 
 class Firewall(EventMixin):
 
-    def __init__(self):
+    def __init__(self, switch_id):
         self.listenTo(core.openflow)
         log.debug("Enabling Firewall Module")
         self.rules = get_configuration_values()
+        self.switch_name = "switch_" + str(switch_id)
+        log.debug(f"Switch ID: {switch_id}")
 
     def _handle_ConnectionUp(self, event):
+        log.debug(f"Event PORT NAME: {event.connection.ports[of.OFPP_LOCAL].name}")
+        if event.connection.ports[of.OFPP_LOCAL].name != self.switch_name:
+            return
         for rule in self.rules:
             self.filter_for_rule(event, rule)
 
@@ -60,5 +65,5 @@ class Firewall(EventMixin):
         event.connection.send(openflow_packet)
 
 
-def launch():
-    core.registerNew(Firewall)
+def launch(switch_id=1):
+    core.registerNew(Firewall, switch_id)

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from mininet.topo import Topo
 
-TOPOS = {'CustomTopology': (lambda: CustomTopology())}
-
-
 class CustomTopology(Topo):
     def __init__(self, n_switches=2):
         if n_switches < 2:
@@ -22,3 +19,5 @@ class CustomTopology(Topo):
         self.addLink(hosts[1], switches[0])
         self.addLink(hosts[2], switches[-1])
         self.addLink(hosts[3], switches[-1])
+
+topos = {'CustomTopology': CustomTopology}
