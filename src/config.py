@@ -3,8 +3,8 @@ import json
 TCP = 6
 UDP = 17
 
-def get_configuration_values(config_file='rules.json'):
-    with open(config_file, 'r') as file:
+def get_configuration_values():
+    with open('rules.json', 'r') as file:
         rules_data = json.load(file)
 
     for r in rules_data:
@@ -15,3 +15,5 @@ def get_configuration_values(config_file='rules.json'):
             r["protocol"] = UDP
     
     return rules_data
+
+print(get_configuration_values())

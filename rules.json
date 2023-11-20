@@ -1,0 +1,18 @@
+[
+  {
+      "destination_port": "80"
+  },
+  {
+      "protocol": "udp",
+      "destination_port": "5001",
+      "source_ip": "10.0.0.1"
+  },
+  {
+    "source_mac": "00:00:00:00:00:02",
+    "dest_mac": "00:00:00:00:00:04"
+  },
+  {
+      "source_mac": "00:00:00:00:00:04",
+      "dest_mac": "00:00:00:00:00:02"
+    }
+]
