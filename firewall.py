@@ -1,15 +1,14 @@
-from pox.pox.core import core
-import pox.pox.openflow.libopenflow_01 as of
-from pox.pox.lib.revent import *
-from pox.pox.lib.util import dpidToStr
-from pox.pox.lib.addresses import EthAddr
-from src.rules import get_configuration_values
+from pox.core import core
+import pox.openflow.libopenflow_01 as of
+from pox.lib.revent import *
+from pox.lib.util import dpidToStr
+from pox.lib.addresses import EthAddr
 from collections import namedtuple
 import os
 import argparse
+import json
 
 log = core.getLogger()
-log.setLevel("DEBUG")
 
 # Add your global variables here ...
 
@@ -24,58 +23,58 @@ class Firewall(EventMixin):
         self.rules = get_configuration_values()
         self.switch_id = switch_id
         log.debug("Firewall initialized for switch %s", switch_id)
+        log.debug("hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola hola ")
 
     def _handle_ConnectionUp(self, event):
-        pass
+        log.debug("handle connectionup")
+        if event.dpid != self.switch_id:
+            continue
+        msg = of.ofp_flow_mod()
+        self.handle_event(event, msg, rule)
 
-    def _handle_PacketIn(self, event):
-        if self.switch_id != event.dpid:
-            return
-        packet = event.parsed
-        log.debug("El paquete que llego es %s ", packet)
-        if packet.type == packet.IP_TYPE:
-            ip_packet = packet.find("ipv4")
-            if ip_packet:
-                log.debug("El paquete ip que llego es %s ", ip_packet)
-                if ip_packet.protocol == TCP:
-                    transport_packet = ip_packet.find("tcp")
-                elif ip_packet.protocol == UDP:
-                    transport_packet = ip_packet.find("udp")
-                else:
-                    transport_packet = None
-
-                if transport_packet:
-                    src_ip = ip_packet.srcip
-                    dst_ip = ip_packet.dstip
-                    src_port = transport_packet.srcport
-                    dst_port = transport_packet.dstport
-                    src_host = self.get_host_from_ip(src_ip, event.topology)
-                    dst_host = self.get_host_from_ip(dst_ip, event.topology)
-
-                    self.filter_packet(packet)
-
-    def get_host_from_ip(self, ip_address, topology):
-        for host_number, ip_addresses in topology.hosts.items():
-            if ip_address in ip_addresses:
-                return host_number
-        return None
-
-    def filter_packet(self, event, protocol, src_ip, dst_ip, src_port, dst_port, src_host, dst_host):
+    def handle_event(self, event):
         for r in self.rules:
-            # puerto de destino 80
+            msg.match.dl_type = ethernet.IP_TYPE
+            if "source_ip" in rule:
+                log.debug(
+                    "Rule installed: dropping packet from IP address %s", rule["source_ip"]
+                )
+                msg.match.nw_src = rule["source_ip"]
+            if "dest_ip" in rule:
+                log.debug(
+                    "Rule installed: dropping packet to IP address %s", rule["dest_ip"]
+                )
+                msg.match.nw_dst = rule["dest_ip"]
+            if "source_port" in rule:
+                log.debug("Rule installed: dropping packet from port %i", rule["source_port"])
+                msg.match.tp_src = rule["source_port"]
+            if "dest_port" in rule:
+                log.debug("Rule installed: dropping packet to port %i", rule["dest_port"])
+                msg.match.tp_dst = rule["dest_port"]
+            if "source_mac" in rule:
+                log.debug("Rule installed: dropping packet from MAC %s", rule["source_mac"])
+                msg.match.dl_src = EthAddr(rule["source_mac"])
+            if "dest_mac" in rule:
+                log.debug("Rule installed: dropping packet to MAC %s", rule["dest_mac"])
+                msg.match.dl_dst = EthAddr(rule["dest_mac"])
+            if rule.get("protocol", None) == "tcp":
+                log.debug("Rule installed: dropping packet over TCP")
+                msg.match.nw_proto = ipv4.TCP_PROTOCOL
+            if rule.get("protocol", None) == "udp":
+                log.debug("Rule installed: dropping packet over UDP")
+                msg.match.nw_proto = ipv4.UDP_PROTOCOL
 
-            # source host_1, puerto 5001, protocolo UDP
-
-            # Conexion entre 2 y 4 bloqueada
-
-    def drop_packet(self, event):
-        log.debug("Entra a romper el paquete")
-
-        msg = of.ofp_packet_out()
-        msg.buffer_id = event.ofp.buffer_id
-        msg.in_port = event.port
         event.connection.send(msg)
 
-    @classmethod
-    def launch(switch_id=1):
-        core.registerNew(Firewall, switch_id=switch_id)
+    def _handle_PacketIn(self, event):
+        pass
+
+def launch(switch_id=1):
+    log.debug("\nLAUNCHING FIREWALL\n")
+    core.registerNew(Firewall, switch_id=switch_id)
+
+def get_configuration_values(config_file='rules.json'):
+    with open(config_file, 'r') as file:
+        rules_data = json.load(file)
+    
+    return rules_data
