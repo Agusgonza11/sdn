@@ -1,7 +1,6 @@
 import json
 
-from pox.pox.core import core
-from pox.pox.lib.revent import *
+from pox.core import core
 
 from network_protocol import NetworkProtocol
 from pox.lib.revent import EventMixin
@@ -21,8 +20,18 @@ class Firewall(EventMixin):
         self.network_protocol = NetworkProtocol()
 
     def _handle_ConnectionUp(self, event):
+        if not self._packet_is_in_same_switch(event):
+            return
         self.network_protocol.add_rules()
+
+    def _packet_is_in_same_switch(self, event):
+        return self.switch_id == event.dpid
 
     def launch(self):
         # Starting the Firewall module
         core.registerNew(Firewall)
+
+
+firewall = Firewall()
+print(firewall.network_protocol.print_rules())
+print(firewall.network_protocol.add_rules())
